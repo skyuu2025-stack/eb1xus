@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<AppView>('landing');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isApiKeyAuthorized, setIsApiKeyAuthorized] = useState<boolean | null>(null);
+  const [isBooting, setIsBooting] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -25,19 +26,23 @@ const App: React.FC = () => {
           setIsApiKeyAuthorized(false);
         }
       } else {
-        // Fallback for direct environment usage
+        // Fallback for direct environment usage where API_KEY is injected
         setIsApiKeyAuthorized(true);
       }
+      setIsBooting(false);
     };
     checkAuth();
   }, []);
 
   const handleAuthorize = async () => {
     if (window.aistudio) {
-      await window.aistudio.openSelectKey();
-      // Assume success after prompt per guidelines
-      setIsApiKeyAuthorized(true);
-      window.location.hash = '#/atrium';
+      try {
+        await window.aistudio.openSelectKey();
+        setIsApiKeyAuthorized(true);
+        window.location.hash = '#/atrium';
+      } catch (err) {
+        console.error("Authorization failed", err);
+      }
     }
   };
 
@@ -84,6 +89,18 @@ const App: React.FC = () => {
     };
     window.location.hash = hashMap[view] || '/';
   };
+
+  // Booting State to prevent white screen
+  if (isBooting) {
+    return (
+      <div className="min-h-screen bg-[#F9F7F2] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-t-2 border-[#A68966] rounded-full animate-spin mx-auto"></div>
+          <p className="font-serif text-[#141E30] tracking-widest uppercase text-xs">Initializing Sovereign Engine</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isApiKeyAuthorized === false) {
     return (
