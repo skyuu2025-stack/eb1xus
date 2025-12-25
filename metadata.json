@@ -1,0 +1,8 @@
+{
+  "name": "EB1X US",
+  "description": "Professional AI-driven assessment tool for US EB1A and O1 extraordinary ability visas, featuring detailed criteria analysis and strategic planning.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
